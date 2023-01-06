@@ -1,0 +1,79 @@
+<style>
+    #data {
+        height: 200px;
+        overflow-y: scroll;
+    }
+</style>
+<pre id="data"></pre>
+<input id="text">
+<button id="call">Call</button>
+<button onclick="reload()">Reload</button>
+<script src="test.js"></script>
+<script src="/socket.io"></script>
+<script src="simplepeer.min.js"></script>
+<script>
+    var io = io();
+
+    function reload() {
+        io.emit("reload", {})
+        window.location.reload()
+    }
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+    }).then((strm) => {
+        var sdpObject;
+        var socket = io;
+        peer1 = new SimplePeer({
+            initiator: true,
+            trickle: false,
+            stream: strm
+        })
+        console.log(strm)
+
+        peer1.on("signal", sdp => {
+            console.log(sdp)
+            sdpObject = sdp;
+        })
+
+        peer1.on("connect", () => {
+            console.log("connected to peer2")
+        })
+
+        peer1.on("stream", (str) => {
+            var audio = document.createElement("video")
+            audio.controls = true
+            audio.srcObject = str
+            document.body.appendChild(audio)
+            audio.play()
+            console.log(str)
+        })
+
+        peer1.on("error", err => console.log("error", err))
+
+        document.getElementById("call").addEventListener("click", () => {
+            socket.emit("p1off", sdpObject)
+        })
+
+        socket.on("connect", () => {
+            console.log("connected")
+        })
+
+        socket.on("p2answer", (p2ans) => {
+            console.log(p2ans)
+            peer1.signal(p2ans)
+        })
+
+        peer1.on("connect", () => {
+            console.log("connected with peer2")
+
+            document.getElementById("text").addEventListener("input", () => {
+                peer1.send(document.getElementById("text").value)
+            })
+        })
+
+        peer1.on("data", data => document.getElementById("data").innerHTML = data)
+    }).catch((error) => {
+        console.log(error)
+    })
+</script>

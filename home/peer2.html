@@ -1,0 +1,104 @@
+<style>
+    #data {
+        height: 200px;
+        overflow-y: scroll;
+    }
+</style>
+<pre id="data"></pre>
+<input id="text">
+<button id="reciverBtn">Receive</button>
+<script src="test.js"></script>
+<script src="simplepeer.min.js"></script>
+<script src="/socket.io"></script>
+<script>
+    function reload() {
+        window.location.reload()
+    }
+
+    var io = io();
+
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+    }).then((strm) => {
+        var ringAudio = new Audio("audio/ringing.mp3");
+        ringAudio.loop = true;
+        var socket = io;
+
+        var peer2 = new SimplePeer({
+            initiator: false,
+            trickle: false,
+            stream: strm
+        })
+        console.log(strm)
+
+        peer2.on("error", err => console.log(err))
+
+        var sdpObject;
+
+        socket.on("connect", () => {
+            console.log("peer2 is connected")
+        })
+
+        socket.on("p1offer", (p1off) => {
+            console.log(p1off)
+            peer2.signal(p1off)
+            peer2.on("signal", (ans) => {
+                sdpObject = ans
+            })
+            ringing()
+        })
+
+        socket.on("reload", () => {
+            reload()
+        })
+
+        peer2.on("connect", () => {
+            console.log("connected with peer1")
+
+            document.getElementById("text").addEventListener("input", () => {
+                peer2.send(document.getElementById("text").value)
+            })
+        })
+
+        peer2.on("stream", (str) => {
+            var audio = document.createElement("video")
+            audio.controls = true
+            document.body.appendChild(audio)
+            audio.srcObject = str
+            audio.play()
+            console.log(str)
+        })
+
+        peer2.on("data", data => document.getElementById("data").innerHTML = data)
+
+        var color = ["red", "blue"];
+        var color_index = 0;
+        var ringint
+        var ringtmo
+
+        function ringing() {
+            ringAudio.play()
+            rignint = setInterval(() => {
+                color_index >= 2 ? color_index = 0 : "";
+                document.getElementById("reciverBtn").style.background = color[color_index];
+                color_index++;
+            }, 100)
+            ringtmo = setTimeout(() => {
+                ringAudio.pause()
+                ringAudio.currentTime = 0
+                clearInterval(rignint)
+                document.getElementById("reciverBtn").style.background = "";
+                clearTimeout(ringtmo)
+            }, 15000)
+            document.getElementById("reciverBtn").addEventListener("click", () => {
+                socket.emit("p2ans", sdpObject)
+                ringAudio.pause()
+                ringAudio.currentTime = 0
+                clearInterval(rignint)
+                document.getElementById("reciverBtn").style.background = "";
+                clearTimeout(ringtmo)
+            });
+        }
+    }).catch(error => console.log(error))
+</script>
