@@ -9,7 +9,7 @@ let io = new Server(server);
 app.use(express.static("material"));
 
 app.get('/', (q, r) => {
-    r.sendFile(__dirname + "/home/index.html");
+    r.send("<a href='/peer1' target='/peer1'><button>PEER1</button></a><br><br><a href='/peer2' target='/peer2'><button>PEER2</button></a>");
 })
 
 app.get('/peer1', (q, r) => {
