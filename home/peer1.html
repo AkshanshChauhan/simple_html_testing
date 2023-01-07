@@ -59,7 +59,7 @@
     }
     
     button {
-        margin: 0px 10px;
+        margin: 0px 5px;
         border-radius: 10px;
         border: 0px;
         outline: 1px solid rgb(155, 155, 155);
@@ -70,6 +70,7 @@
         background-color: rgb(156, 255, 156);
     }
 </style>
+<h3 id="conn"></h3>
 <div class="videos-section mb" id="vid_section">
     <video src="" id="peer1_video" autoplay muted></video>
 </div>
@@ -83,14 +84,18 @@
 <script>
     var io = io();
 
-    io.on("connect", () => {
+    io.on("connect", async() => {
         console.log("Socket.io : peer1 is connected")
+        await io.on("conn", (conn) => {
+            document.getElementById("conn").innerText = conn >= 2 ? "Total Connection's : " + conn : "Total Connection : Only Me!";
+        })
     })
 
     function reload() {
         io.emit("reload", {})
         window.location.reload()
     }
+
     navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
@@ -111,9 +116,9 @@
 
         peer1.on("stream", (str) => {
             var audio = document.createElement("video")
-            audio.controls = true
             audio.srcObject = str
             audio.className = "other-video"
+            audio.volume = 1
             document.getElementById("vid_section").appendChild(audio)
             audio.play()
             audio.controls = false
@@ -123,10 +128,12 @@
 
         document.getElementById("call").addEventListener("click", () => {
             socket.emit("p1off", sdpObject)
+            document.getElementById("call").setAttribute("disabled", "true")
         })
 
         socket.on("p2answer", (p2ans) => {
             peer1.signal(p2ans)
+            document.getElementById("call").removeAttribute("disabled")
         })
 
         peer1.on("connect", () => {

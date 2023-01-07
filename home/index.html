@@ -1,0 +1,136 @@
+<style>
+    * {
+        padding: 0px;
+        margin: 0px;
+        color: white;
+        transition-duration: 0.3s;
+    }
+    
+     ::selection {
+        text-decoration: underline;
+        color: rgb(255, 230, 0);
+        text-shadow: 0px 0px 2px white;
+    }
+    
+    body {
+        padding: 10px;
+        display: grid;
+        align-content: flex-start;
+        gap: 10px;
+        height: 90vh;
+        background-color: rgb(42, 0, 149);
+    }
+    
+    .links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        gap: 30px;
+    }
+    
+    .links_li {
+        display: flex;
+        gap: 10px;
+    }
+    
+    h1 {
+        animation: shadow 10s infinite cubic-bezier(1, 1, 1, 1);
+        background-image: url("R.png");
+        filter: invert(1);
+        background-size: 100px;
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+        background-position-x: -100px;
+    }
+    
+    @keyframes shadow {
+        50% {
+            background-position-x: 100px;
+        }
+        100% {
+            background-position-x: -100px;
+        }
+    }
+    
+    center {
+        position: absolute;
+        bottom: 50px;
+        justify-self: center;
+    }
+    
+    button {
+        position: relative;
+        border: 0px;
+        outline: 2px solid rgb(255, 196, 0);
+        background-color: transparent;
+        padding: 10px;
+        color: rgb(255, 196, 0);
+        cursor: pointer;
+        background: linear-gradient(90deg, rgb(255, 196, 0) 100px, rgba(255, 196, 0, 0) 100px);
+        background-position-x: -100px;
+        background-repeat: no-repeat;
+    }
+    
+    .p2 {
+        background: linear-gradient(90deg, rgb(255, 196, 0) 100px, rgba(255, 196, 0, 0) 100px);
+        background-position-x: 100px;
+        background-repeat: no-repeat;
+    }
+    
+    button:hover {
+        box-shadow: 5px 5px 0px blue;
+        background-position-x: 0px;
+        color: blue;
+    }
+    
+    img:hover {
+        border-radius: 10px;
+    }
+    
+    .hv {
+        width: fit-content;
+    }
+    
+    .hv:hover {
+        color: rgb(255, 77, 0);
+    }
+</style>
+<h1>Welcome to this WebRTC Chatting Web Application</h1>
+<div class="links">
+    <h3>Start from here, become a Peer1 and become a Peer2</h3>
+    <div class="links_li">
+        <a href='/peer1' target='/peer1'><button class="p1">PEER1</button></a>
+        <a href='/peer2' target='/peer2'><button class="p2">PEER2</button></a>
+    </div>
+</div>
+<h3 onclick="howto(this)" class="hv" style="cursor: pointer;">How to Start?</h3>
+<div id="howto">
+    <li>Give the Permission's of <b>Camera</b> and <b>Mic</b></li>
+    <li>Peer1 call Peer2 on clicking <b>[call button]</b></li>
+    <li>Peer2 receive a call of Peer1 by clicking on <b>[receive button]</b></li><br>
+    <ol>WebRTC Started</ol>
+</div>
+<center>
+    <summery style='display: flex; align-items: center; justify-content: center; gap: 10px'>About :
+        <a href='https://www.linkedin.com/in/akshansh-chauhan-5430281b2/'><img src='images/linkedin.png' width='20px'></a>
+        <a href='https://github.com/AkshanshChauhan'><img src='https://avatars.githubusercontent.com/u/92544823?v=4' width='20px'></a>
+    </summery>
+</center>
+<script src="/jquery"></script>
+<script>
+    document.body.onload = () => {
+        alert('this site is under development');
+    }
+
+    $("#howto").hide();
+
+    function howto(e) {
+        e.style.color = "rgb(150, 255, 150)";
+        $("#howto").show();
+    }
+</script>

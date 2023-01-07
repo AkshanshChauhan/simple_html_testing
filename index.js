@@ -9,10 +9,12 @@ let io = new Server(server);
 app.use(express.static("material"));
 
 app.get('/', (q, r) => {
-    r.send("<h1>Welcome to this WebRTC Chatting Web Application</h1><a href='/peer1/aksh8923' target='/peer1/aksh8923'><button>PEER1</button></a><br><br><a href='/peer2/aksh8923' target='/peer2/aksh8923'><button>PEER2</button></a><br><br><center><summery>About : This site is Created by <b>Akshansh Chauhan</b></summery></center>");
+    r.sendFile(__dirname + "/home/index.html");
 })
 
-
+app.get('/jquery', (q, r) => {
+    r.sendFile(__dirname + "/node_modules/jquery/dist/jquery.min.js")
+})
 
 app.get('/peer1', (q, r) => {
     r.sendFile(__dirname + "/home/peer1.html")
@@ -27,14 +29,19 @@ app.get('/socket.io', (q, r) => {
 })
 var count_user = 0;
 
-io.sockets.on("connect", (o) => {
+io.on("connect", (o) => {
 
-    count_user++;
+    count_user = count_user + 1;
 
     o.on("disconnect", () => {
-        count_user--
-        console.log();
+        count_user = count_user - 1;
+        console.log("disconnected", count_user, o.id);
+        o.emit("conn", count_user)
+        o.broadcast.emit("conn", count_user)
     })
+
+    o.emit("conn", count_user)
+    o.broadcast.emit("conn", count_user)
 
     console.log("connected", count_user, o.id)
 
