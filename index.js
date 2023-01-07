@@ -9,15 +9,23 @@ let io = new Server(server);
 app.use(express.static("material"));
 
 app.get('/', (q, r) => {
-    r.send("<a href='/peer1' target='/peer1'><button>PEER1</button></a><br><br><a href='/peer2' target='/peer2'><button>PEER2</button></a>");
+    r.send("<h1>Welcome to this WebRTC Chatting Web Application</h1><a href='/peer1/?auth=' target='/peer1/?auth='><button>PEER1</button></a><br><br><a href='/peer2/?auth=' target='/peer2/?auth='><button>PEER2</button></a><br><br><center><summery>About : This site is Created by <b>Akshansh Chauhan</b></summery></center>");
 })
 
-app.get('/peer1', (q, r) => {
-    r.sendFile(__dirname + "/home/peer1.html")
+app.get('/peer1/', (q, r) => {
+    if (q.query.auth == "call2") {
+        r.sendFile(__dirname + "/home/peer1.html")
+    } else {
+        r.send(`Your are not Authorize Peer 1 <br>Enter S.Code Here : <input type='password' placeholder='enter s...code' onchange="window.location.href = '?auth=' + this.value;">`)
+    }
 })
 
-app.get('/peer2', (q, r) => {
-    r.sendFile(__dirname + "/home/peer2.html")
+app.get('/peer2/', (q, r) => {
+    if (q.query.auth == "call1") {
+        r.sendFile(__dirname + "/home/peer2.html")
+    } else {
+        r.send(`Your are not Authorize Peer 2 <br>Enter S.Code Here : <input type='password' placeholder='enter s...code' onchange="window.location.href = '?auth=' + this.value;">`)
+    }
 })
 
 app.get('/socket.io', (q, r) => {
