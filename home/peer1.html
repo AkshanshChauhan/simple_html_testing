@@ -1,4 +1,4 @@
-<link rel="shortcut icon" href="icon.png" type="image/x-icon">
+<link rel="shortcut icon" href="images/icon.png" type="image/x-icon">
 <title>Peer1</title>
 <style>
     * {
@@ -80,6 +80,7 @@
 <textarea id="text" class="mb" placeholder="message..."></textarea>
 <button class="pd" id="call">Call</button>
 <button class="pd" onclick="reload()">Reload</button>
+<select id="camera"></select>
 <script src="test.js"></script>
 <script src="/socket.io"></script>
 <script src="simplepeer.min.js"></script>
@@ -98,9 +99,40 @@
         window.location.reload()
     }
 
+    navigator.mediaDevices.enumerateDevices().then((dev) => {
+        let vid = document.getElementById("camera");
+        dev.forEach(e => {
+            let opt = new Option();
+            opt.value = e.deviceId;
+
+            switch (e.kind) {
+                case "videoinput":
+                    opt.text = e.label || `Camera ${vid.length + 1}`;
+                    vid.appendChild(opt);
+                    console.log(e.deviceId)
+                    break;
+            }
+        })
+    })
+
     navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
+        video: {
+            frameRate: {
+                exact: 30
+            },
+            facingMode: "environment",
+            width: {
+                max: 200,
+                ideal: 150,
+                min: 100
+            },
+            height: {
+                max: 200,
+                ideal: 150,
+                min: 100
+            }
+        },
+        audio: true,
     }).then((strm) => {
         var sdpObject;
         var socket = io;

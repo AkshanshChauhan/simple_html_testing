@@ -94,6 +94,10 @@ app.post('/faq', async(q, r, err) => {
     }
 })
 
+app.get('/peer2-display', (q, r) => {
+    r.sendFile(__dirname + "/home/peer2-display.html")
+})
+
 app.get('/faq/q/', (q, r) => {
     r.sendFile(__dirname + "/faq.txt")
 })

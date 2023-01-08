@@ -98,23 +98,8 @@
         })
     })
 
-    navigator.mediaDevices.getUserMedia({
-        video: {
-            frameRate: {
-                exact: 30
-            },
-            facingMode: "environment",
-            width: {
-                max: 200,
-                ideal: 150,
-                min: 100
-            },
-            height: {
-                max: 200,
-                ideal: 150,
-                min: 100
-            }
-        },
+    navigator.mediaDevices.getDisplayMedia({
+        video: true,
         audio: true
     }).then((strm) => {
         var ringAudio = new Audio("audio/ringing.mp3");

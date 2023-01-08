@@ -1,4 +1,4 @@
-<link rel="shortcut icon" href="icon.png" type="image/x-icon">
+<link rel="shortcut icon" href="images/icon.png" type="image/x-icon">
 <meta name="description" content="WebRTC : do Video calling With WebRTC peer to peer connection, join now.">
 <meta name=”robots” content="index, follow">
 <meta name=”robots” content="noindex, nofollow">
@@ -90,10 +90,21 @@
         background-repeat: no-repeat;
     }
     
-    .p2 {
+    .p3 {
         background: linear-gradient(90deg, rgb(255, 196, 0) 100px, rgba(255, 196, 0, 0) 100px);
         background-position-x: 100px;
         background-repeat: no-repeat;
+    }
+    
+    .p2 {
+        background: linear-gradient(180deg, rgb(255, 196, 0) 100px, rgba(255, 196, 0, 0) 100px);
+        background-position-y: 100px;
+        background-repeat: no-repeat;
+    }
+    
+    .p2:hover {
+        background-position-x: 0px;
+        background-position-y: 0px;
     }
     
     button:hover {
@@ -193,6 +204,7 @@
     <div class="links_li">
         <a href='/peer1' target='/peer1'><button class="p1">PEER1</button></a>
         <a href='/peer2' target='/peer2'><button class="p2">PEER2</button></a>
+        <a href='/peer2-display' target='/peer2-display'><button class="p3">PEER3</button></a>
     </div>
 </div>
 <h3 onclick="howto(this)" class="hv" style="cursor: pointer;">How to Start?</h3>
@@ -200,6 +212,7 @@
     <li>Give the Permission's of <b>Camera</b> and <b>Mic</b></li>
     <li>Peer1 call Peer2 on clicking <b>[call button]</b></li>
     <li>Peer2 receive a call of Peer1 by clicking on <b>[receive button]</b></li><br>
+    <li>Peer3 is for sharing Display Media like screen sharing : mainly work's on Desktop or Leptop's</li>
     <ol>WebRTC Started</ol>
 </div>
 <center>
