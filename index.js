@@ -1,15 +1,81 @@
 const express = require("express");
 const { Server } = require("socket.io");
-const http = require("http");
+const https = require("https");
+const fs = require("fs");
+const bodyParser = require("body-parser")
+const path = require("path");
+const e = require("express");
 const port = process.env.PORT || 1000;
 let app = express();
-let server = http.createServer(app);
+
+app.use(express.urlencoded())
+app.use(bodyParser.json())
+
+function gtTime() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = ("0" + (now.getMonth() + 1)).slice(-2);
+    const day = ("0" + now.getDate()).slice(-2);
+
+    const hour = ("0" + now.getHours()).slice(-2);
+    const minute = ("0" + now.getMinutes()).slice(-2);
+    const second = ("0" + now.getSeconds()).slice(-2);
+
+    // YYYY-MM-DD hh:mm:ss
+    const formatted = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    return formatted;
+}
+
+var faq = {
+    q: [
+        "hello",
+        "who develop you",
+        "who create you",
+        "who make you",
+        "what is this",
+        "how many people connected at one time",
+        "location area coordinates",
+        "mobile number",
+        "time"
+    ],
+    a: [
+        "hi, how can i help you?",
+        "Akshansh Chauhan Develop Me",
+        "I am Created by Akshansh Chauhan",
+        "I am build by Akshansh Chauhan",
+        "This site is for Communication, Through Video and Audio",
+        "Mainly Two, as peer1 and peer2. But you can make Several Peer1 and Peer2 at a same time",
+        "Uttarakhand, India",
+        "+91 ******5377, :)",
+        gtTime()
+    ]
+}
+
+const options = {
+    key: fs.readFileSync(path.join(__dirname, './certs/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, './certs/cert.pem'))
+}
+
+let server = https.createServer(options, app).listen(port, () => {
+    console.log("Express Server listening on port " + port)
+});
+
 let io = new Server(server);
 
 app.use(express.static("material"));
 
 app.get('/', (q, r) => {
     r.sendFile(__dirname + "/home/index.html");
+})
+
+app.post('/faq', (q, r) => {
+    if (faq.q.includes(q.body.quest)) {
+        r.send(faq.a[faq.q.indexOf(q.body.quest)])
+    } else {
+        r.send("I don's Understand You :(")
+        fs.appendFileSync("faq.txt", "question [" + gtTime() + "] : " + q.body.quest + "\n", "utf-8")
+    }
 })
 
 app.get('/jquery', (q, r) => {
@@ -59,8 +125,4 @@ io.on("connect", (o) => {
         o.broadcast.emit("reload", {})
     })
 
-})
-
-server.listen(port, () => {
-    console.log('listning on port ' + port);
 })

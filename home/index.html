@@ -19,6 +19,10 @@
         gap: 10px;
         height: 90vh;
         background-color: rgb(42, 0, 149);
+        background-image: url("images/background.jpg");
+        background-size: cover;
+        background-blend-mode: saturation;
+        background-repeat: no-repeat;
     }
     
     .links {
@@ -41,6 +45,7 @@
         background-image: url("R.png");
         filter: invert(1);
         background-size: 100px;
+        text-align: center;
         -webkit-text-fill-color: transparent;
         -webkit-background-clip: text;
         -moz-background-clip: text;
@@ -99,6 +104,74 @@
     .hv:hover {
         color: rgb(255, 77, 0);
     }
+    
+    .chatbot {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        padding: 2px;
+        width: 300px;
+        height: 452px;
+        display: grid;
+        gap: 2px;
+        border-radius: 10px;
+        background-color: rgb(167, 187, 255);
+    }
+    
+    .chatbot>input {
+        border-radius: 10px;
+        height: fit-content;
+        padding: 10px;
+        border: 0px;
+        outline: 0px;
+        color: blue;
+    }
+    
+    .window {
+        display: grid;
+        align-content: flex-start;
+        border-radius: 10px;
+        padding: 5px;
+        height: 400px;
+        background-color: aliceblue;
+        gap: 10px;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    }
+    
+    .window::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .chat-bot {
+        margin-right: 20px;
+        background-color: rgb(33, 114, 255);
+        padding: 10px;
+        border-radius: 10px;
+        border-bottom-left-radius: 0px;
+    }
+    
+    .chat {
+        margin-left: 20px;
+        background-color: rgb(85, 33, 255);
+        padding: 10px;
+        border-radius: 10px;
+        border-bottom-right-radius: 0px;
+    }
+    
+    .chatbot-btn {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: 50px;
+        height: 50px;
+        background-color: rgb(0, 149, 255);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 <h1>Welcome to this WebRTC Chatting Web Application</h1>
 <div class="links">
@@ -121,7 +194,48 @@
         <a href='https://github.com/AkshanshChauhan'><img src='https://avatars.githubusercontent.com/u/92544823?v=4' width='20px'></a>
     </summery>
 </center>
+<div class="chatbot-btn">HELP</div>
+<div class="chatbot">
+    <div class="window">
+    </div>
+    <input type="text" class="input" placeholder="faq? ex : hello">
+</div>
 <script src="/jquery"></script>
+
+<script>
+    $(".chatbot").hide()
+
+    function appinwin(ele, flag) {
+        var p = document.createElement("p");
+        p.innerText = ele;
+        flag == 1 ? p.className = "chat-bot" : p.className = "chat";
+        document.querySelector(".window").appendChild(p);
+    }
+
+    $(".input").on("change", () => {
+        sendQuestion($(".input").val())
+        $(".input").val("")
+    })
+
+    $(".chatbot-btn").on("click", () => {
+        $(".chatbot").show()
+    })
+
+    function sendQuestion(qu) {
+        appinwin(qu, 2)
+        $.ajax({
+            method: "post",
+            url: "/faq",
+            data: {
+                quest: qu
+            },
+            success: (data) => {
+                ((data != null) && (data != "")) ? appinwin(data, 1): null;
+                $(".window").scrollTop(9999999999999999)
+            }
+        })
+    }
+</script>
 <script>
     document.body.onload = () => {
         alert('this site is under development');
