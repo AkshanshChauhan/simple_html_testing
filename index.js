@@ -1,15 +1,13 @@
 const express = require("express");
 const { Server } = require("socket.io");
-const https = require("https");
+const http = require("http");
 const fs = require("fs");
-const bodyParser = require("body-parser")
 const path = require("path");
 const e = require("express");
 const port = process.env.PORT || 1000;
 let app = express();
 
 app.use(express.urlencoded())
-app.use(bodyParser.json())
 
 function gtTime() {
     const now = new Date();
@@ -52,12 +50,12 @@ var faq = {
     ]
 }
 
-const options = {
-    key: fs.readFileSync(path.join(__dirname, './certs/key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, './certs/cert.pem'))
-}
+// const options = {
+//     key: fs.readFileSync(path.join(__dirname, './certs/key.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, './certs/cert.pem'))
+// }
 
-let server = https.createServer(options, app).listen(port, () => {
+let server = http.createServer(app).listen(port, () => {
     console.log("Express Server listening on port " + port)
 });
 
