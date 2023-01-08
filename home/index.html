@@ -1,3 +1,12 @@
+<link rel="shortcut icon" href="icon.png" type="image/x-icon">
+<meta name="description" content="WebRTC : do Video calling With WebRTC peer to peer connection, join now.">
+<meta name=”robots” content="index, follow">
+<meta name=”robots” content="noindex, nofollow">
+<meta name=”robots” content="noindex, follow">
+<meta name=”robots” content="index, nofollow">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<title>WebRTC : Peer To Peer Connection</title>
 <style>
     * {
         padding: 0px;
@@ -172,6 +181,11 @@
         justify-content: center;
         align-items: center;
     }
+    
+    mark {
+        color: rgb(196, 249, 255);
+        color: black;
+    }
 </style>
 <h1>Welcome to this WebRTC Chatting Web Application</h1>
 <div class="links">
@@ -198,7 +212,12 @@
 <div class="chatbot">
     <div class="window">
     </div>
-    <input type="text" class="input" placeholder="faq? ex : hello">
+    <input type="text" class="input" list="suggestionlist" placeholder="faq? ex : hello">
+    <datalist id="suggestionlist">
+        <option value="develop">Developer</option>
+        <option value="location">Location</option>
+        <option value="webrtc">WebRTC</option>
+    </datalist>
 </div>
 <script src="/jquery"></script>
 
@@ -207,7 +226,7 @@
 
     function appinwin(ele, flag) {
         var p = document.createElement("p");
-        p.innerText = ele;
+        p.innerHTML = ele;
         flag == 1 ? p.className = "chat-bot" : p.className = "chat";
         document.querySelector(".window").appendChild(p);
     }
