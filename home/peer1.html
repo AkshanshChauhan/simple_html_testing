@@ -1,78 +1,8 @@
 <link rel="shortcut icon" href="images/icon.png" type="image/x-icon">
 <title>Peer1</title>
-<style>
-    * {
-        margin: 0px;
-        padding: 0px;
-    }
-    
-    #data {
-        height: 200px;
-        overflow-y: scroll;
-        background-color: rgb(45, 0, 107);
-        color: rgb(255, 187, 0);
-        padding: 10px;
-    }
-    
-    #text {
-        width: 100%;
-        height: 20vh;
-        background-color: aliceblue;
-        color: rgb(45, 0, 107);
-        resize: none;
-        padding: 10px;
-    }
-    
-    .mb {
-        margin-bottom: 10px;
-    }
-    
-    .pd {
-        padding: 10px;
-    }
-    
-    .videos-section {
-        padding: 10px;
-        height: fit-content;
-        position: relative;
-        background-color: rgb(70, 36, 101);
-    }
-    
-    .other-video {
-        position: relative;
-        width: 100%;
-        object-fit: cover;
-        border-radius: 10px;
-        height: 90vh;
-    }
-    
-    #peer1_video {
-        position: absolute;
-        width: 20vw;
-        object-fit: cover;
-        border-radius: 10px;
-        z-index: 10;
-        top: 20px;
-        left: 20px;
-    }
-    
-    #peer1_video:hover {
-        filter: blur(10px);
-    }
-    
-    button {
-        margin: 0px 5px;
-        border-radius: 10px;
-        border: 0px;
-        outline: 1px solid rgb(155, 155, 155);
-        cursor: pointer;
-    }
-    
-    button:active {
-        background-color: rgb(156, 255, 156);
-    }
-</style>
+<link rel="stylesheet" href="style/peer1.css">
 <h3 id="conn"></h3>
+<div class="loading"></div>
 <div class="videos-section mb" id="vid_section">
     <video src="" id="peer1_video" autoplay muted></video>
 </div>
@@ -80,12 +10,16 @@
 <textarea id="text" class="mb" placeholder="message..."></textarea>
 <button class="pd" id="call">Call</button>
 <button class="pd" onclick="reload()">Reload</button>
-<select id="camera"></select>
+<select id="camera" onchange="changeDiv(this.value)"></select>
 <script src="test.js"></script>
 <script src="/socket.io"></script>
 <script src="simplepeer.min.js"></script>
+<script src="/jquery"></script>
 <script>
     var io = io();
+
+    $('#call').hide()
+    $('.loading').hide()
 
     io.on("connect", async() => {
         console.log("Socket.io : peer1 is connected")
@@ -99,6 +33,8 @@
         window.location.reload()
     }
 
+    var id = null;
+
     navigator.mediaDevices.enumerateDevices().then((dev) => {
         let vid = document.getElementById("camera");
         dev.forEach(e => {
@@ -109,77 +45,75 @@
                 case "videoinput":
                     opt.text = e.label || `Camera ${vid.length + 1}`;
                     vid.appendChild(opt);
-                    console.log(e.deviceId)
                     break;
             }
         })
     })
 
-    navigator.mediaDevices.getUserMedia({
-        video: {
-            frameRate: {
-                exact: 30
-            },
-            facingMode: "environment",
-            width: {
-                max: 200,
-                ideal: 150,
-                min: 100
-            },
-            height: {
-                max: 200,
-                ideal: 150,
-                min: 100
-            }
-        },
-        audio: true,
-    }).then((strm) => {
-        var sdpObject;
-        var socket = io;
-        peer1 = new SimplePeer({
-            initiator: true,
-            trickle: false,
-            stream: strm
-        })
+    var vidobj = {
+        deviceId: "",
+        frameRate: 30
+    }
 
-        document.getElementById("peer1_video").srcObject = strm;
+    const changeDiv = (cam) => {
+        vidobj.deviceId = cam;
 
-        peer1.on("signal", sdp => {
-            sdpObject = sdp;
-        })
+        console.log(vidobj)
 
-        peer1.on("stream", (str) => {
-            var audio = document.createElement("video")
-            audio.srcObject = str
-            audio.className = "other-video"
-            audio.volume = 1
-            document.getElementById("vid_section").appendChild(audio)
-            audio.play()
-            audio.controls = false
-        })
-
-        peer1.on("error", err => console.log("error", err))
-
-        document.getElementById("call").addEventListener("click", () => {
-            socket.emit("p1off", sdpObject)
-            document.getElementById("call").setAttribute("disabled", "true")
-        })
-
-        socket.on("p2answer", (p2ans) => {
-            peer1.signal(p2ans)
-            document.getElementById("call").removeAttribute("disabled")
-        })
-
-        peer1.on("connect", () => {
-            console.log("RTC : peer1 is connected with peer2")
-
-            document.getElementById("text").addEventListener("input", () => {
-                peer1.send(document.getElementById("text").value)
+        navigator.mediaDevices.getUserMedia({
+            video: vidobj,
+            audio: true
+        }).then((strm) => {
+            var sdpObject;
+            var socket = io;
+            peer1 = new SimplePeer({
+                initiator: true,
+                trickle: false,
+                stream: strm
             })
-        })
 
-        peer1.on("data", data => document.getElementById("data").innerHTML = data)
-    }).catch((error) => {
-        console.log(error)
-    })
+            $('.loading').show()
+
+            document.getElementById("peer1_video").srcObject = strm;
+
+            peer1.on("signal", (sdp) => {
+                sdpObject = sdp;
+                document.getElementById("call").addEventListener("click", () => {
+                    socket.emit("p1off", sdpObject)
+                    document.getElementById("call").setAttribute("disabled", "true")
+                })
+                $('.loading').hide()
+                $('#call').show()
+            })
+
+            peer1.on("stream", (str) => {
+                var audio = document.createElement("video")
+                audio.srcObject = str
+                audio.className = "other-video"
+                audio.volume = 1
+                document.getElementById("vid_section").appendChild(audio)
+                audio.play()
+                audio.controls = false
+            })
+
+            peer1.on("error", err => console.log("error", err))
+
+            socket.on("p2answer", (p2ans) => {
+                peer1.signal(p2ans)
+                document.getElementById("call").removeAttribute("disabled")
+            })
+
+            peer1.on("connect", () => {
+                console.log("RTC : peer1 is connected with peer2")
+
+                document.getElementById("text").addEventListener("input", () => {
+                    peer1.send(document.getElementById("text").value)
+                })
+            })
+
+            peer1.on("data", data => document.getElementById("data").innerHTML = data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
 </script>

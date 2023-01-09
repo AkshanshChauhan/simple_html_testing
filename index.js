@@ -85,13 +85,14 @@ app.post('/faq', async(q, r, err) => {
         }
     })
     if (cond == true) {
-        r.send(faq.a[ind])
+        r.json({ status: "ok", message: faq.a[ind] })
         ind = 0
     } else {
-        r.send("sorry, i can't get!")
+        r.json({ status: "notfound", message: "<span style='color: rgb(140, 180,180)'>srorry, i can't get!</span>" })
         fs.appendFileSync("faq.txt", "question [" + gtTime() + "] : " + q.body.quest + "\n", "utf-8")
         ind = 0
     }
+    cond = false
 })
 
 app.get('/peer2-display', (q, r) => {
@@ -117,6 +118,7 @@ app.get('/peer2', (q, r) => {
 app.get('/socket.io', (q, r) => {
     r.sendFile(__dirname + "/node_modules/socket.io/client-dist/socket.io.min.js")
 })
+
 var count_user = 0;
 
 io.on("connect", (o) => {
